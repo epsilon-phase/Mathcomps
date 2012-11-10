@@ -2,6 +2,7 @@ package bump.org.comp.color;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ColorList implements IColorFunction {
 	/**
@@ -31,6 +32,11 @@ public class ColorList implements IColorFunction {
 
 	public void setColorAtStep(int i, Color e) {
 		datas.set(i, e);
+	}
+
+	public void addColors(List<Color> a) {
+		for (Color i : a)
+			datas.add(i);
 	}
 
 	@Override

@@ -42,5 +42,6 @@ public class ColorShower extends Canvas {
 	 */
 	public void setDisplayColor(Color display) {
 		this.display = display;
+		repaint();
 	}
 }

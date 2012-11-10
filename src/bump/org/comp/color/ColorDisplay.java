@@ -3,6 +3,7 @@ package bump.org.comp.color;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 import java.awt.Graphics;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -24,7 +25,8 @@ public class ColorDisplay extends Canvas {
 	 *            the x coordinate of the click
 	 * @param y
 	 *            the y coordinate of the click
-	 * @return the index of the clicked upon box.
+	 * @return the index of the clicked upon box. Or negative one if it manages
+	 *         to miss.
 	 */
 	public int getIndexOfMouseclip(int x, int y) {
 		for (int i = 0; i < HitBoxes.size(); i++) {
@@ -32,6 +34,8 @@ public class ColorDisplay extends Canvas {
 				// set the property so that the component may be repainted to
 				// show the selection.
 				indexselected = i;
+				// If there is a valid selection, repaint the thingy.
+				repaint();
 				return i;
 			}
 		}// return a negative number, indicating that it does not work properly.
@@ -43,6 +47,7 @@ public class ColorDisplay extends Canvas {
 	public void paint(Graphics g) {
 		int hstep = getWidth();
 		int vstep;
+		HitBoxes.clear();
 		try {
 			vstep = getHeight() / abs.getMaxStep();
 			if (isGridded()) {
@@ -62,17 +67,23 @@ public class ColorDisplay extends Canvas {
 						hstep, vstep));
 				// if the index is selected, draw a black rectangle around it.
 				if (i == indexselected) {
-					g.setColor(Color.black);
-					g.drawRect(hstep * (i / 5), vstep * (i % 5), hstep, vstep);
+
 				}
 			} else {
 				g.fillRect(0, vstep * i, hstep, vstep);
 				HitBoxes.add(new Rectangle2D.Float(0, vstep * i, hstep, vstep));
 				// if the index is selected, draw a black rectangle around it.
-				if (i == indexselected) {
-					g.setColor(Color.black);
-					g.drawRect(0, vstep * i, hstep, vstep * i);
-				}
+			}
+		}
+		if (indexselected != -1) {
+			g.setColor(Color.black);
+			g.setXORMode(Color.white);
+			if (gridded) {
+
+				g.drawRect(hstep * (indexselected / 5), vstep
+						* (indexselected % 5), hstep, vstep);
+			} else {
+				g.drawRect(0, vstep * indexselected, hstep, vstep);
 			}
 		}
 
@@ -82,8 +93,19 @@ public class ColorDisplay extends Canvas {
 		return abs.getColorAtStep(i);
 	}
 
+	public void addColor(Color g) {
+		abs.addColor(g);
+		repaint();
+	}
+
+	public void addColor(List<Color> g) {
+		abs.addColors(g);
+		repaint();
+	}
+
 	public void setColorAtIndex(int i, Color g) {
 		abs.setColorAtStep(i, g);
+		repaint();
 	}
 
 	/**
