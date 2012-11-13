@@ -93,7 +93,7 @@ public class ChartingThing extends Canvas {
 			Path2D.Double e = new Path2D.Double();
 			e.moveTo(0, vstep * data.get(0));
 			for (int i = 2; i < data.size(); i++) {
-				if (!curvelines)
+				if (!isCurvelines())
 					e.lineTo(hstep * i, data.get(i) * vstep);
 				else {
 					// quadratic interpolation
@@ -107,6 +107,9 @@ public class ChartingThing extends Canvas {
 		}
 	}
 
+	/**
+	 * Whether or not to curve the lines a bit more(Doesn't do much right now).
+	 */
 	private boolean curvelines = true;
 	private Color backgroundcolor = Color.white;
 	/**
@@ -160,6 +163,23 @@ public class ChartingThing extends Canvas {
 	 */
 	public void setAntialias(boolean antialias) {
 		this.antialias = antialias;
+	}
+
+	/**
+	 * @return the curvelines
+	 * @see bump.org.comp.ChartingThing.curvelines
+	 */
+	public boolean isCurvelines() {
+		return curvelines;
+	}
+
+	/**
+	 * @param curvelines
+	 *            whether or not the lines should be curved.
+	 * @see bump.org.comp.ChartingThing.curvelines
+	 */
+	public void setCurvelines(boolean curvelines) {
+		this.curvelines = curvelines;
 	}
 
 	int ytick = 5, xtick = 5;
