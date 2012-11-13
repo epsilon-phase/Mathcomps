@@ -59,9 +59,8 @@ public class MultiLineChart extends ChartingThing {
 
 		}
 		// preserve the ticks.
-		put.setXORMode(Color.gray);
-		put.draw(new Rectangle2D.Float(-getWidth() / 2, -getHeight() / 2,
-				getWidth() / 2, getHeight() / 2));
+		put.setXORMode(Color.gray);// fill in the background.
+		put.draw(new Rectangle2D.Float(0, 0, getWidth(), getHeight() / 2));
 		// allow the data line to overwrite the current colors.
 		put.setPaintMode();
 		put.setColor(linecolor);

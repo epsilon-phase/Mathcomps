@@ -42,6 +42,14 @@ public class ColorDisplay extends Canvas {
 		return -1;
 	}
 
+	/**
+	 * <p>
+	 * The color index that has been selected to it being selected.
+	 * </p>
+	 * <p>
+	 * Special Return types: -1 indicates that there is no selection
+	 * </p>
+	 */
 	private int indexselected = -1;
 
 	public void paint(Graphics g) {
