@@ -49,6 +49,10 @@ public class ColorPicker extends JPanel {
 		colorShower.setDisplayColor(g);
 	}
 
+	public IColorFunction getColorFunction() {
+		return this.colorDisplay.abs;
+	}
+
 	/**
 	 * Create the panel.
 	 */
@@ -64,7 +68,7 @@ public class ColorPicker extends JPanel {
 		setLayout(gridBagLayout);
 
 		colorDisplay = new ColorDisplay();
-		
+
 		colorDisplay.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
