@@ -42,6 +42,9 @@ public class ColorDisplay extends Canvas {
 		return -1;
 	}
 
+	/**
+	 * The index of the selected color in the list.
+	 */
 	private int indexselected = -1;
 
 	public void paint(Graphics g) {
