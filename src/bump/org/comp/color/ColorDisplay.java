@@ -43,7 +43,16 @@ public class ColorDisplay extends Canvas {
 	}
 
 	/**
+<<<<<<< HEAD
 	 * The index of the selected color in the list.
+=======
+	 * <p>
+	 * The color index that has been selected to it being selected.
+	 * </p>
+	 * <p>
+	 * Special Return types: -1 indicates that there is no selection
+	 * </p>
+>>>>>>> mutliline
 	 */
 	private int indexselected = -1;
 
