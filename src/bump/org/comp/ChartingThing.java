@@ -28,13 +28,18 @@ public class ChartingThing extends Canvas {
 		ytick = y;
 	}
 
+	/**
+	 * The amount of scaleup to do in rendering the control.
+	 */
+	private double zoomfactor = 1.0;
+
 	public void paint(Graphics g) {
 		if (data.size() > 0) {
 			Graphics2D put = (Graphics2D) g.create();
 
 			double vstep;
 			double hstep = (getWidth() / data.size());
-
+			put.scale(zoomfactor, zoomfactor);
 			vstep = (getHeight() / (ChartingUtil.getdiff(data)));
 			// make sure it isn't too small.
 			if (vstep < .2) {
@@ -44,15 +49,21 @@ public class ChartingThing extends Canvas {
 			// Add rendering hints to the graphics objects according to the
 			// members of the class.
 			RenderingHints h;
+
 			if (antialias) {
 				h = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
 						RenderingHints.VALUE_ANTIALIAS_ON);
-				h.add(new RenderingHints(RenderingHints.KEY_INTERPOLATION,
-						RenderingHints.VALUE_INTERPOLATION_BICUBIC));
+
 			} else {
 				h = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
 						RenderingHints.VALUE_ANTIALIAS_OFF);
 			}
+			if (bicubic)
+				h.add(new RenderingHints(RenderingHints.KEY_INTERPOLATION,
+						RenderingHints.VALUE_INTERPOLATION_BICUBIC));
+			else
+				h.add(new RenderingHints(RenderingHints.KEY_INTERPOLATION,
+						RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
 			put.addRenderingHints(h);
 			put.setColor(Color.black);
 			// Draw the horizontal Axis.
@@ -91,8 +102,18 @@ public class ChartingThing extends Canvas {
 			put.setPaintMode();
 			put.setColor(linecolor);
 			Path2D.Double e = new Path2D.Double();
-			e.moveTo(0, vstep * data.get(0));
-			for (int i = 2; i < data.size(); i++) {
+			if (!fillArea)// If the component is not set to fill beneath the
+							// line, then just move the first point to the
+							// appropriate place as specified by the data
+							// available
+				e.moveTo(0, vstep * data.get(0));
+			else {
+				// move to origin
+				e.moveTo(0, 0);
+				// line to the first datapoint.
+				e.lineTo(0, vstep * data.get(0));
+			}
+			for (int i = 1; i < data.size(); i++) {
 				if (!isCurvelines())
 					e.lineTo(hstep * i, data.get(i) * vstep);
 				else {
@@ -101,12 +122,34 @@ public class ChartingThing extends Canvas {
 							* data.get(i - 1) + 2, i * hstep, data.get(i)
 							* vstep);
 				}
+				if (fillArea && i == data.size() - 1)
+					// put a vertical line going to the initial level of the
+					// line.
+					e.lineTo(hstep * i, 0);
 
 			}
+			// If the flag is set, allow fill in the path, rather than letting
+			// it go.
+			if (fillArea) {
+
+				put.fill(e);
+				e.closePath();
+			}
 			put.draw(e);
+
 		}
+
 	}
 
+	/**
+	 * Controls whether or not Bicubic interpolation is used in rendering the
+	 * component.
+	 */
+	private boolean bicubic = false;
+	/**
+	 * Controls whether or not the path is to be filled once it is rendered.
+	 */
+	private boolean fillArea = false;
 	/**
 	 * Whether or not to curve the lines a bit more(Doesn't do much right now).
 	 */
@@ -180,6 +223,52 @@ public class ChartingThing extends Canvas {
 	 */
 	public void setCurvelines(boolean curvelines) {
 		this.curvelines = curvelines;
+	}
+
+	/**
+	 * @return Whether the component is set to fill in underneath the chart.
+	 */
+	public boolean isAreaFilled() {
+		return fillArea;
+	}
+
+	/**
+	 * @param fillArea
+	 *            Set whether or not the component fills in the area underneath
+	 *            the chart.
+	 */
+	public void setFillArea(boolean fillArea) {
+		this.fillArea = fillArea;
+	}
+
+	/**
+	 * @return a boolean indicating whether or not the control is set to use
+	 *         Bicubic interpolation.
+	 */
+	public boolean isBicubic() {
+		return bicubic;
+	}
+
+	/**
+	 * @param boolean considering whether or not the bicubic rendering is being
+	 *        used.
+	 */
+	public void setBicubic(boolean bicubic) {
+		this.bicubic = bicubic;
+	}
+
+	/**
+	 * @return the zoomfactor
+	 */
+	public double getZoomfactor() {
+		return zoomfactor;
+	}
+
+	/**
+	 * @param zoomfactor the zoomfactor to set
+	 */
+	public void setZoomfactor(double zoomfactor) {
+		this.zoomfactor = zoomfactor;
 	}
 
 	int ytick = 5, xtick = 5;

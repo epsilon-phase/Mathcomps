@@ -13,12 +13,46 @@ import bump.org.comp.ChartingThing;
 import javax.swing.JTextField;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import javax.swing.JPopupMenu;
+import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class ChartingThingTest extends JFrame {
+
+	private final class ActionListenerImplementation implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			setchecks();
+		}
+	}
 
 	private JPanel contentPane;
 	private ChartingThing qw;
 	private JTextField textField;
+	private JPopupMenu popupMenu;
+	private JCheckBoxMenuItem chckbxmntmBicubicInterpolation;
+	private JCheckBoxMenuItem chckbxmntmAntialiasing;
+	private JCheckBoxMenuItem chckbxmntmUseQuadraticInterpolation;
+	private JMenuItem mntmClearData;
+	private JCheckBoxMenuItem chckbxmntmFillInGraph;
+	private JMenuItem mntmSetZoom;
+
+	private void setchecks() {
+		qw.setAntialias(chckbxmntmAntialiasing.isSelected());
+		qw.setBicubic(chckbxmntmBicubicInterpolation.isSelected());
+		qw.setCurvelines(chckbxmntmUseQuadraticInterpolation.isSelected());
+		qw.setFillArea(chckbxmntmFillInGraph.isSelected());
+	}
+
+	private void updatechecks() {
+		chckbxmntmUseQuadraticInterpolation.setSelected(qw.isCurvelines());
+		chckbxmntmBicubicInterpolation.setSelected(qw.isBicubic());
+		chckbxmntmAntialiasing.setSelected(qw.isAntialias());
+		chckbxmntmFillInGraph.setSelected(qw.isAreaFilled());
+	}
 
 	/**
 	 * Launch the application.
@@ -82,6 +116,44 @@ public class ChartingThingTest extends JFrame {
 		});
 		contentPane.add(qw, BorderLayout.CENTER);
 
+		popupMenu = new JPopupMenu();
+		addPopup(qw, popupMenu);
+
+		chckbxmntmBicubicInterpolation = new JCheckBoxMenuItem(
+				"Bicubic Interpolation");
+		chckbxmntmBicubicInterpolation
+				.addActionListener(new ActionListenerImplementation());
+		popupMenu.add(chckbxmntmBicubicInterpolation);
+
+		chckbxmntmAntialiasing = new JCheckBoxMenuItem("AntiAliasing");
+
+		popupMenu.add(chckbxmntmAntialiasing);
+
+		chckbxmntmUseQuadraticInterpolation = new JCheckBoxMenuItem(
+				"Use quadratic interpolation");
+
+		popupMenu.add(chckbxmntmUseQuadraticInterpolation);
+		chckbxmntmAntialiasing
+				.addActionListener(new ActionListenerImplementation());
+		chckbxmntmBicubicInterpolation
+				.addActionListener(new ActionListenerImplementation());
+
+		chckbxmntmFillInGraph = new JCheckBoxMenuItem("Fill in graph");
+		chckbxmntmFillInGraph
+				.addActionListener(new ActionListenerImplementation());
+		popupMenu.add(chckbxmntmFillInGraph);
+		mntmClearData = new JMenuItem("Clear Data");
+		mntmClearData.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				qw.setData(new int[] {});
+			}
+		});
+		
+		mntmSetZoom = new JMenuItem("Set Zoom");
+		popupMenu.add(mntmSetZoom);
+
+		popupMenu.add(mntmClearData);
+
 		textField = new JTextField();
 		textField.addKeyListener(new KeyAdapter() {
 			@Override
@@ -95,5 +167,26 @@ public class ChartingThingTest extends JFrame {
 		});
 		contentPane.add(textField, BorderLayout.SOUTH);
 		textField.setColumns(10);
+		updatechecks();
+	}
+
+	private static void addPopup(Component component, final JPopupMenu popup) {
+		component.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+
+			private void showMenu(MouseEvent e) {
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		});
 	}
 }
