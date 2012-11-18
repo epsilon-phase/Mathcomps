@@ -10,6 +10,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Path2D;
 import java.awt.geom.Path2D.Double;
 import java.awt.geom.Point2D;
@@ -175,9 +176,9 @@ public final class LineChart extends Canvas {
 			// move to the center of where you want rendered.
 			h.translate(originpoint[0], originpoint[1]);
 			// scale up appropriately
-			h.scale(scalex, scaley);
+			h.scale(-scalex, -scaley);
 			// rotate so higher coordinates are up, rather than down.
-			h.rotate(Math.PI);
+			// h.rotate(Math.PI);
 			Path2D.Double e = new Path2D.Double();
 			e.moveTo(datas.get(0).getX(), datas.get(0).getY());
 			for (Point2D.Double d : datas) {
@@ -185,19 +186,26 @@ public final class LineChart extends Canvas {
 			}
 			h.setColor(linecolor);
 			h.draw(e);
+
 			h.setColor(ChartingUtil.createInverse(backgroundColor));
-			drawCoordinate(h);
-			// Rotate so that it is possible to translate and scale properly.
-			h.rotate(-Math.PI);
-			// scale back down with the reciprocal of the original transform
-			if (!showCoordinates)
-				h.scale(1 / scalex, 1 / scaley);
-			else
-				// it already has been correctly scaled.
-				// now flip the y axis
-				h.scale(1, -1);
-			// reverse the translation
-			h.translate(-originpoint[0], -originpoint[1]);
+			if (points) {
+
+				for (Point2D.Double d : datas) {
+
+					h.fill(new Ellipse2D.Double(d.getX(), d.getY(), 1, 1));
+				}
+
+			}
+			if (showCoordinates)
+				drawCoordinate(h);
+
+			try {
+				h.transform(h.getTransform().createInverse());
+			} catch (NoninvertibleTransformException e1) {
+				h.scale(-1 / scalex, -1 / scaley);
+				h.translate(-originpoint[0], -originpoint[1]);
+				e1.printStackTrace();
+			}
 			// Set the color to be the inverse of the background.
 			h.draw(new Line2D.Double(getWidth() / 2, 0, getWidth() / 2,
 					getHeight()));
@@ -209,23 +217,14 @@ public final class LineChart extends Canvas {
 		}
 	}
 
-	private void drawCoordinate(Graphics2D h) {
-		if (showCoordinates) {
-			AffineTransform ee = new AffineTransform();
-			// create a new scale in order to correctly position the stuff.
-			ee.setToScale(scalex, scaley);
-			h.scale(1 / scalex, -1 / scaley);
-			for (int i = 0; i < datas.size(); i++) {
-				Point2D.Double temp = new Point2D.Double(datas.get(i).getX(),
-						datas.get(i).getY());
-				ee.transform(temp, temp);
-				h.draw(new Ellipse2D.Double(temp.getX(), temp.getY(), 2, 2));
-				h.drawString(java.lang.Double.toString(datas.get(i).getX())
-						+ "," + java.lang.Double.toString(datas.get(i).getY()),
-						(float) temp.getX() + 5, (float) temp.getY() + 5);
-			}
+	/**
+	 * Controls whether or not the control renders the points as circles over
+	 * them.
+	 */
+	private boolean points = true;
 
-		}
+	private void drawCoordinate(Graphics2D h) {
+		// TODO write coordinate translating code
 	}
 
 	public void setBackgroundColor(Color backgroundColor) {
@@ -328,5 +327,21 @@ public final class LineChart extends Canvas {
 		scalex += factor;
 		scaley += factor;
 		repaint();
+	}
+
+	/**
+	 * @return whether or not the points are rendered above the line
+	 */
+	public boolean isPoints() {
+		return points;
+	}
+
+	/**
+	 * @param points
+	 *            whether or not to include the points as drawn upon the
+	 *            component.
+	 */
+	public void setPoints(boolean points) {
+		this.points = points;
 	}
 }
