@@ -4,11 +4,19 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Path2D.Double;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+
+import bump.org.util.ChartingUtil;
 
 /**
  * Think ChartingThing without the zoom factor or the automatic scaling.
@@ -16,24 +24,160 @@ import java.util.ArrayList;
  * @author Jaked122
  * 
  */
-public class LineChart extends Canvas {
+public final class LineChart extends Canvas {
+	private boolean antialias = true;
+
+	/**
+	 * The background Color to be drawn behind the graph.
+	 */
+	private Color backgroundColor = Color.white;
+	/**
+	 * A variable that controls whether or not the rendering process uses
+	 * bicubic interpolation to compute colors.
+	 */
+	private boolean bicubic = false;
+	/**
+	 * The arraylist containing datapoints which are to be diplayed.
+	 */
+	private ArrayList<Point2D.Double> datas;
+	/**
+	 * The last size of the component(if it scales up, then the component will
+	 * resize to fit the view it held before).
+	 */
+	private int[] lastsize;
+	/**
+	 * The Color of the line drawn by the control to represent the data.
+	 */
+	private Color linecolor = Color.green;
+	/**
+	 * The move
+	 */
+	private double[] originpoint = new double[] { 0, 0 };
+
+	private double scalex = 0;
+
+	private double scaley = 0;
+
+	private double scalingfactor;
+	/**
+	 * If this is turned on, then the coordinates of the points on the line will
+	 * be shown as well upon the line.
+	 */
+	private boolean showCoordinates = false;
+	private double tickx, ticky;
+
+	public LineChart() {
+		datas = new ArrayList<Point2D.Double>();
+		scaley = 10;
+		scalex = 10;
+		this.addMouseWheelListener(new MouseWheelListener() {
+
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				zoom(e.getWheelRotation());
+			}
+		});
+	}
+
+	/**
+	 * Add data to the set, displaying it when it is done
+	 * 
+	 * @param a
+	 *            The two dimensional array with two elements to each
+	 *            element.(the points)
+	 */
+	public void addDatas(double[][] a) {
+
+		for (double[] c : a)
+			this.datas.add(new Point2D.Double(c[0], c[1]));
+		repaint();
+	}
+
+	public Color getBackgroundColor() {
+		return backgroundColor;
+	}
+
+	/**
+	 * @return The data being shown in the component
+	 */
+	public ArrayList<Point2D.Double> getDatas() {
+		return datas;
+	}
+
+	public Color getLinecolor() {
+		return linecolor;
+	}
+
+	/**
+	 * @return the originpoint
+	 */
+	public double[] getOriginpoint() {
+		return originpoint;
+	}
+
+	public double getTickx() {
+		return tickx;
+	}
+
+	public double getTicky() {
+		return ticky;
+	}
+
+	/**
+	 * @return the bicubic
+	 */
+	public boolean isBicubic() {
+		return bicubic;
+	}
+
+	/**
+	 * @return Whether or not the coordinates are rendered as text on the line.
+	 */
+	public boolean isShowCoordinates() {
+		return showCoordinates;
+	}
+
 	public void paint(Graphics g) {
-		scalex = getWidth() / 10;
-		scaley = getHeight() / 10;
+		if (lastsize == null) {
+			lastsize = new int[2];
+			lastsize[0] = getWidth();
+			lastsize[1] = getHeight();
+		}
+		if (scalex == 0) {
+			// initialize the scalex to be a tenth of the width of
+			// the entire component
+			scalex = getWidth() / 10;
+		}
+		if (scaley == 0) {
+			// Initialize the scaley to be a tenth of width of the
+			// entire component
+			scaley = getHeight() / 10;
+		}
 		if (datas.size() > 0 && datas != null) {
 			Graphics2D h = (Graphics2D) g.create();
-			h.setColor(Color.black);
-			h.draw(new Line2D.Double(getWidth() / 2, 0, getWidth() / 2,
-					getHeight()));
-			h.draw(new Line2D.Double(0, getHeight() / 2, getWidth(),
-					getHeight() / 2));
-			h.drawString(java.lang.Double.toString(originpoint[0]) + ":"
-					+ java.lang.Double.toString(originpoint[1]),
-					getWidth() / 2, getHeight() / 2);
+			RenderingHints j;
+			if (antialias)
+				j = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
+						RenderingHints.VALUE_ANTIALIAS_ON);
+			else
+				j = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
+						RenderingHints.VALUE_ANTIALIAS_OFF);
+			if (bicubic)
+				j.add(new RenderingHints(RenderingHints.KEY_INTERPOLATION,
+						RenderingHints.VALUE_INTERPOLATION_BICUBIC));
+			else
+				j.add(new RenderingHints(RenderingHints.KEY_INTERPOLATION,
+						RenderingHints.VALUE_INTERPOLATION_BILINEAR));
+			h.addRenderingHints(j);
+			// Fill in with the background color
+			h.setColor(backgroundColor);
+			h.fill(new Rectangle2D.Double(0, 0, getWidth(), getHeight()));
 			// move to the center of where you want rendered.
 			h.translate(originpoint[0], originpoint[1]);
-
+			// scale up appropriately
 			h.scale(scalex, scaley);
+			// rotate so higher coordinates are up, rather than down.
+			h.rotate(Math.PI);
 			Path2D.Double e = new Path2D.Double();
 			e.moveTo(datas.get(0).getX(), datas.get(0).getY());
 			for (Point2D.Double d : datas) {
@@ -41,10 +185,126 @@ public class LineChart extends Canvas {
 			}
 			h.setColor(linecolor);
 			h.draw(e);
+			h.setColor(ChartingUtil.createInverse(backgroundColor));
+			drawCoordinate(h);
+			// Rotate so that it is possible to translate and scale properly.
+			h.rotate(-Math.PI);
+			// scale back down with the reciprocal of the original transform
+			if (!showCoordinates)
+				h.scale(1 / scalex, 1 / scaley);
+			else
+				// it already has been correctly scaled.
+				// now flip the y axis
+				h.scale(1, -1);
+			// reverse the translation
+			h.translate(-originpoint[0], -originpoint[1]);
+			// Set the color to be the inverse of the background.
+			h.draw(new Line2D.Double(getWidth() / 2, 0, getWidth() / 2,
+					getHeight()));
+			h.draw(new Line2D.Double(0, getHeight() / 2, getWidth(),
+					getHeight() / 2));
+			h.drawString(java.lang.Double.toString(originpoint[0]) + ":"
+					+ java.lang.Double.toString(originpoint[1]),
+					getWidth() / 2, getHeight() / 2);
 		}
 	}
 
-	private double tickx, ticky;
+	private void drawCoordinate(Graphics2D h) {
+		if (showCoordinates) {
+			AffineTransform ee = new AffineTransform();
+			// create a new scale in order to correctly position the stuff.
+			ee.setToScale(scalex, scaley);
+			h.scale(1 / scalex, -1 / scaley);
+			for (int i = 0; i < datas.size(); i++) {
+				Point2D.Double temp = new Point2D.Double(datas.get(i).getX(),
+						datas.get(i).getY());
+				ee.transform(temp, temp);
+				h.draw(new Ellipse2D.Double(temp.getX(), temp.getY(), 2, 2));
+				h.drawString(java.lang.Double.toString(datas.get(i).getX())
+						+ "," + java.lang.Double.toString(datas.get(i).getY()),
+						(float) temp.getX() + 5, (float) temp.getY() + 5);
+			}
+
+		}
+	}
+
+	public void setBackgroundColor(Color backgroundColor) {
+		this.backgroundColor = backgroundColor;
+	}
+
+	/**
+	 * @param bicubic
+	 *            Whether or not the component should render with Bicubic color
+	 *            interpolation
+	 */
+	public void setBicubic(boolean bicubic) {
+		this.bicubic = bicubic;
+	}
+
+	/**
+	 * @param datas
+	 *            The data to show
+	 */
+	public void setDatas(ArrayList<Point2D.Double> datas) {
+		this.datas = datas;
+	}
+
+	/**
+	 * Clear the dataset, allowing for a new function to be properly rendered.
+	 * 
+	 * @param a
+	 *            A two dimensional array of doubles with paired values
+	 *            expressing points.
+	 */
+	public void setDatas(double[][] a) {
+		datas.clear();
+		for (double[] c : a)
+			this.datas.add(new Point2D.Double(c[0], c[1]));
+		repaint();
+
+	}
+
+	public void setLinecolor(Color linecolor) {
+		this.linecolor = linecolor;
+	}
+
+	/**
+	 * @param originpoint
+	 *            the pair of coordinates(x,y) which the display is offset by
+	 */
+	public void setOriginpoint(double[] originpoint) {
+		this.originpoint = originpoint;
+	}
+
+	/**
+	 * @param showCoordinates
+	 *            Set whether or not coordinates are rendered as text.
+	 */
+	public void setShowCoordinates(boolean showCoordinates) {
+		this.showCoordinates = showCoordinates;
+	}
+
+	public void setTickx(double tickx) {
+		this.tickx = tickx;
+	}
+
+	public void setTicky(double ticky) {
+		this.ticky = ticky;
+	}
+
+	public void setzoom(double x, double y) {
+		scalex = x;
+		scaley = y;
+		repaint();
+	}
+
+	public void shift(double x, double y) {
+
+		shiftx(x);
+		shifty(y);
+		repaint();
+
+	}
 
 	/**
 	 * shift to the left.
@@ -64,93 +324,9 @@ public class LineChart extends Canvas {
 		originpoint[1] += y;
 	}
 
-	public void shift(double x, double y) {
-		shiftx(x);
-		shifty(y);
+	public void zoom(double factor) {
+		scalex += factor;
+		scaley += factor;
 		repaint();
 	}
-
-	private Color linecolor = Color.green;
-	private Color backgroundColor;
-	private double scalingfactor;
-
-	private double[] originpoint = new double[] { 0, 0 };
-
-	public LineChart() {
-		datas = new ArrayList<Point2D.Double>();
-		scaley = 10;
-		scalex = 10;
-	}
-
-	public Color getLinecolor() {
-		return linecolor;
-	}
-
-	public void setLinecolor(Color linecolor) {
-		this.linecolor = linecolor;
-	}
-
-	public Color getBackgroundColor() {
-		return backgroundColor;
-	}
-
-	public void setBackgroundColor(Color backgroundColor) {
-		this.backgroundColor = backgroundColor;
-	}
-
-	public double getTicky() {
-		return ticky;
-	}
-
-	public void setTicky(double ticky) {
-		this.ticky = ticky;
-	}
-
-	public double getTickx() {
-		return tickx;
-	}
-
-	public void setTickx(double tickx) {
-		this.tickx = tickx;
-	}
-
-	/**
-	 * @return The data being shown in the component
-	 */
-	public ArrayList<Point2D.Double> getDatas() {
-		return datas;
-	}
-
-	/**
-	 * @param datas
-	 *            The data to show
-	 */
-	public void setDatas(ArrayList<Point2D.Double> datas) {
-		this.datas = datas;
-	}
-
-	public void addDatas(double[][] a) {
-
-		for (double[] c : a)
-			this.datas.add(new Point2D.Double(c[0], c[1]));
-	}
-
-	/**
-	 * @return the originpoint
-	 */
-	public double[] getOriginpoint() {
-		return originpoint;
-	}
-
-	/**
-	 * @param originpoint
-	 *            the originpoint to set
-	 */
-	public void setOriginpoint(double[] originpoint) {
-		this.originpoint = originpoint;
-	}
-
-	private ArrayList<Point2D.Double> datas;
-	private int scalex;
-	private int scaley;
 }

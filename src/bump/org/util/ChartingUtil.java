@@ -1,5 +1,6 @@
 package bump.org.util;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -13,11 +14,31 @@ public class ChartingUtil {
 
 	}
 
+	/**
+	 * Find the smallest integer in a collection.
+	 * 
+	 * @param a
+	 *            the collection of integers
+	 * @return the smallest integer in a.
+	 */
 	public static int min(Collection<Integer> a) {
 		int i = Integer.MAX_VALUE;
 		for (int z : a)
 			i = Math.min(z, i);
 		return i;
+	}
+
+	/**
+	 * Inverts a color so as to give maximum contrast.
+	 * 
+	 * @param i
+	 *            The color to create an inverse of
+	 * @return The inverted color
+	 */
+	public static Color createInverse(Color i) {
+		Color g = new Color(255 - i.getRed(), 255 - i.getGreen(),
+				255 - i.getBlue());
+		return g;
 	}
 
 	public static int min(Collection<Collection<Integer>> d, Object e) {
