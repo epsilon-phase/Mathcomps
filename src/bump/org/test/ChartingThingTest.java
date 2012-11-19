@@ -20,6 +20,8 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import bump.org.comp.AnimatedChartThing;
+import java.awt.Color;
 
 public class ChartingThingTest extends JFrame {
 
@@ -48,10 +50,6 @@ public class ChartingThingTest extends JFrame {
 	}
 
 	private void updatechecks() {
-		chckbxmntmUseQuadraticInterpolation.setSelected(qw.isCurvelines());
-		chckbxmntmBicubicInterpolation.setSelected(qw.isBicubic());
-		chckbxmntmAntialiasing.setSelected(qw.isAntialias());
-		chckbxmntmFillInGraph.setSelected(qw.isAreaFilled());
 	}
 
 	/**
@@ -81,39 +79,12 @@ public class ChartingThingTest extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 
-		qw = new ChartingThing();
+		qw = new AnimatedChartThing();
+		qw.setBackgroundcolor(Color.BLACK);
+		qw.setCurvelines(false);
+		qw.setBicubic(true);
+		qw.setFillArea(false);
 		qw.setData(new int[] { 23, 34, 52, 23, 35, 12 });
-		qw.addMouseListener(new MouseListener() {
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				qw.addDataPoint(e.getY());
-			}
-		});
 		contentPane.add(qw, BorderLayout.CENTER);
 
 		popupMenu = new JPopupMenu();
@@ -171,22 +142,5 @@ public class ChartingThingTest extends JFrame {
 	}
 
 	private static void addPopup(Component component, final JPopupMenu popup) {
-		component.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					showMenu(e);
-				}
-			}
-
-			public void mouseReleased(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					showMenu(e);
-				}
-			}
-
-			private void showMenu(MouseEvent e) {
-				popup.show(e.getComponent(), e.getX(), e.getY());
-			}
-		});
 	}
 }

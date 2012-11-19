@@ -31,7 +31,7 @@ public class ChartingThing extends Canvas {
 	/**
 	 * The amount of scaleup to do in rendering the control.
 	 */
-	private double zoomfactor = 1.0;
+	protected double zoomfactor = 1.0;
 
 	public void paint(Graphics g) {
 		if (data.size() > 0) {
@@ -65,7 +65,12 @@ public class ChartingThing extends Canvas {
 				h.add(new RenderingHints(RenderingHints.KEY_INTERPOLATION,
 						RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
 			put.addRenderingHints(h);
-			put.setColor(Color.black);
+			put.setPaintMode();
+			// set the color to the background color member
+			put.setColor(backgroundcolor);
+			// Fill the background of the graph
+			put.fill(new Rectangle2D.Float(0, 0, getWidth(), getHeight()));
+			put.setColor(ChartingUtil.createInverse(backgroundcolor));
 			// Draw the horizontal Axis.
 			put.draw(new Line2D.Double(0, getHeight() / 2, getWidth(),
 					getHeight() / 2));
@@ -91,13 +96,6 @@ public class ChartingThing extends Canvas {
 					put.draw(new Line2D.Double(hstep * (i - 1), 0, hstep * (i),
 							5));
 			}
-			// preserve the ticks.
-			put.setXORMode(Color.gray);
-			// set the color to the background color member
-			put.setColor(backgroundcolor);
-			// Fill the background of the graph
-			put.fill(new Rectangle2D.Float(-getWidth() / 2, -getHeight() / 2,
-					getWidth() / 2, getHeight() / 2));
 			// allow the data line to overwrite the current colors.
 			put.setPaintMode();
 			put.setColor(linecolor);
@@ -145,20 +143,20 @@ public class ChartingThing extends Canvas {
 	 * Controls whether or not Bicubic interpolation is used in rendering the
 	 * component.
 	 */
-	private boolean bicubic = false;
+	protected boolean bicubic = false;
 	/**
 	 * Controls whether or not the path is to be filled once it is rendered.
 	 */
-	private boolean fillArea = false;
+	protected boolean fillArea = false;
 	/**
 	 * Whether or not to curve the lines a bit more(Doesn't do much right now).
 	 */
 	private boolean curvelines = true;
-	private Color backgroundcolor = Color.white;
+	private Color backgroundcolor = Color.black;
 	/**
 	 * The value that determines whether or not the lines should be antialiased.
 	 */
-	private boolean antialias = true;
+	protected boolean antialias = true;
 
 	public void SetColor(Color g) {
 		linecolor = g;
@@ -265,12 +263,28 @@ public class ChartingThing extends Canvas {
 	}
 
 	/**
-	 * @param zoomfactor the zoomfactor to set
+	 * @param zoomfactor
+	 *            the zoomfactor to set
 	 */
 	public void setZoomfactor(double zoomfactor) {
 		this.zoomfactor = zoomfactor;
 	}
 
+	/**
+	 * @return the backgroundcolor
+	 */
+	public Color getBackgroundcolor() {
+		return backgroundcolor;
+	}
+
+	/**
+	 * @param backgroundcolor
+	 *            the backgroundcolor to set
+	 */
+	public void setBackgroundcolor(Color backgroundcolor) {
+		this.backgroundcolor = backgroundcolor;
+	}
+
 	int ytick = 5, xtick = 5;
-	ArrayList<Integer> data;
+	protected ArrayList<Integer> data;
 }

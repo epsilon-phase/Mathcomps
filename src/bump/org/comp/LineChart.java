@@ -65,7 +65,6 @@ public final class LineChart extends Canvas {
 	 * be shown as well upon the line.
 	 */
 	private boolean showCoordinates = false;
-	private double tickx, ticky;
 
 	public LineChart() {
 		datas = new ArrayList<Point2D.Double>();
@@ -114,14 +113,6 @@ public final class LineChart extends Canvas {
 	 */
 	public double[] getOriginpoint() {
 		return originpoint;
-	}
-
-	public double getTickx() {
-		return tickx;
-	}
-
-	public double getTicky() {
-		return ticky;
 	}
 
 	/**
@@ -244,7 +235,7 @@ public final class LineChart extends Canvas {
 	 * @param datas
 	 *            The data to show
 	 */
-	public void setDatas(ArrayList<Point2D.Double> datas) {
+	private void setDatas(ArrayList<Point2D.Double> datas) {
 		this.datas = datas;
 	}
 
@@ -283,14 +274,6 @@ public final class LineChart extends Canvas {
 		this.showCoordinates = showCoordinates;
 	}
 
-	public void setTickx(double tickx) {
-		this.tickx = tickx;
-	}
-
-	public void setTicky(double ticky) {
-		this.ticky = ticky;
-	}
-
 	public void setzoom(double x, double y) {
 		scalex = x;
 		scaley = y;
@@ -318,6 +301,7 @@ public final class LineChart extends Canvas {
 	 * Shift up.
 	 * 
 	 * @param y
+	 *            the amount to shift up by.
 	 */
 	private void shifty(double y) {
 		originpoint[1] += y;
