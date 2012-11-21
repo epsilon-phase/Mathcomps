@@ -15,7 +15,23 @@ import java.util.Collection;
 import bump.org.comp.color.IColorFunction;
 import bump.org.util.ChartingUtil;
 
-public class MultiLineChart extends ChartingThing {
+/**
+ * <p>
+ * Shows multiple lines on a single chart.
+ * </p>
+ * <p>
+ * Works in a similar way to the single chart component (ChartingThing), but
+ * shows multiple sets of data.
+ * </p>
+ * <p>
+ * Data has a color determined by a IColorFunction(typically a ColorList) which
+ * provides its own methods of changing the color scheme.
+ * </p>
+ * 
+ * @author Jaked122
+ * 
+ */
+public class MultiLineChart extends SingleLineChart {
 	public void AddSeries(ArrayList<Integer> g) {
 		this.data.add(g);
 		repaint();
@@ -42,25 +58,28 @@ public class MultiLineChart extends ChartingThing {
 			h = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_OFF);
 		}
+		// If set for bicubic rendering, add it.
+		if (isBicubic()) {
+			h.add(new RenderingHints(RenderingHints.KEY_INTERPOLATION,
+					RenderingHints.VALUE_INTERPOLATION_BICUBIC));
+		}
 		put.addRenderingHints(h);
-		put.setColor(Color.black);
-
+		put.setColor(getBackgroundcolor());
+		// fill in the background.
+		put.fill(new Rectangle2D.Float(0, 0, getWidth(), getHeight()));
+		put.setColor(ChartingUtil.createInverse(getBackgroundcolor()));
 		for (int i = 0; i < data.size(); i++) {
 			put.draw(new Line2D.Double(hstep * (i - 1), 0, hstep * (i), 0));
 			if (i % xtick == 0)
 				put.draw(new Line2D.Double(hstep * (i - 1), -vstep,
 						hstep * (i), vstep));
-		}// draw the vertical ticks.
+		}
+		// draw the vertical ticks.
 		put.draw(new Line2D.Double(getWidth() / 2, 0, getWidth() / 2,
 				getHeight()));
 		for (int i = 0; i * vstep < getHeight() / (2 * ChartingUtil.Max(data)); i++) {
-			// start in the middle and radiate outwards.
 			put.draw(new Line2D.Double(0, vstep * i, hstep, vstep * i));
-
 		}
-		// preserve the ticks.
-		put.setXORMode(Color.gray);// fill in the background.
-		put.draw(new Rectangle2D.Float(0, 0, getWidth(), getHeight() / 2));
 		// allow the data line to overwrite the current colors.
 		put.setPaintMode();
 		put.setColor(linecolor);
@@ -91,6 +110,17 @@ public class MultiLineChart extends ChartingThing {
 
 	}
 
+	@Override
+	public final Color getBackground() {
+		return this.getBackgroundcolor();
+	}
+
+	@Override
+	public final void setBackground(Color g) {
+		this.setBackgroundcolor(g);
+		repaint();
+	}
+
 	/**
 	 * <p>
 	 * The series that is manipulated by the setTargetSeries and returned by
@@ -110,7 +140,7 @@ public class MultiLineChart extends ChartingThing {
 	 *            the new series to target
 	 * @see bump.org.comp.MultiLineChart.targetseries
 	 */
-	public void setTargetSeries(int i) {
+	public final void setTargetSeries(int i) {
 		targetseries = i;
 	}
 
@@ -121,12 +151,20 @@ public class MultiLineChart extends ChartingThing {
 	 * @return the dataseries being manipulated
 	 * @see bump.org.comp.MultiLineChart.targetseries
 	 */
-	public int getTargetSeries() {
+	public final int getTargetSeries() {
 		return targetseries;
 	}
 
+	/**
+	 * Add data to the current target series.
+	 * 
+	 * @param i
+	 *            <p>
+	 *            The array of data to add to the chart.
+	 *            </p>
+	 */
 	@Override
-	public void addData(int[] i) {
+	public final void addData(int[] i) {
 		for (int e : i)
 			data.get(targetseries).add(e);
 		repaint();
@@ -135,7 +173,7 @@ public class MultiLineChart extends ChartingThing {
 	/**
 	 * @return the color
 	 */
-	public IColorFunction getColorFunction() {
+	public final IColorFunction getColorFunction() {
 		return color;
 	}
 

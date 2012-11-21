@@ -15,11 +15,25 @@ import bump.org.util.ChartingUtil;
  * @author Jaked122
  * 
  */
-public class AnimatedChartThing extends ChartingThing {
-	Thread updator;
-	private int updaterate = 1;
-
-	private float frame = 0.1F;
+public class AnimatedSingleLineChart extends SingleLineChart {
+	/**
+	 * The initial update rate for the control, ends up being around ten frames
+	 * a second.
+	 */
+	private static final float INITIAL_UPDATE_RATE = 0.1F;
+	/**
+	 * The thread in charge of updating the control.
+	 */
+	private Thread updator;
+	/**
+	 * The rate at which the component updates.
+	 */
+	private float updaterate = INITIAL_UPDATE_RATE;
+	/**
+	 * The frame count for animation. Determines what element on the list to
+	 * iterate up to.
+	 */
+	private int frame = 1;
 
 	/**
 	 * 
@@ -27,11 +41,24 @@ public class AnimatedChartThing extends ChartingThing {
 	 *            the rate as specified by the desired number of frames per
 	 *            second
 	 */
-	public void setframecount(int rate) {
+	public final void setframerate(int rate) {
 		updaterate = 1000 / rate;
 	}
 
-	public AnimatedChartThing() {
+	/**
+	 * create the control with a target framerate in mind.
+	 * 
+	 * @param framerate
+	 *            The frames per second goal for the control.
+	 */
+	public AnimatedSingleLineChart(int framerate) {
+		// call the other constructor.
+		this();
+		// set the frame rate.
+		setframerate(framerate);
+	}
+
+	public AnimatedSingleLineChart() {
 
 		super();
 		updator = new Thread(new Runnable() {
@@ -39,11 +66,13 @@ public class AnimatedChartThing extends ChartingThing {
 			@Override
 			public void run() {
 				while (true) {
-					if (AnimatedChartThing.this.isVisible())
+					// if this instance of the control is visible, repaint.
+					if (AnimatedSingleLineChart.this.isVisible())
 						repaint();
 					try {
-						Thread.sleep((int) 1000
-								* AnimatedChartThing.this.getUpdaterate());
+						// sleep so that the frameness is correctly done.
+						Thread.sleep((int) (1000 * (AnimatedSingleLineChart.this
+								.getUpdaterate())));
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -109,7 +138,6 @@ public class AnimatedChartThing extends ChartingThing {
 				}
 			}
 			// put the x-axis in the middle of the chart
-			// put.translate(0, getHeight() / 2);
 			for (int i = 0; i < data.size(); i++) {
 
 				if (i % xtick == 0)// Draw the ticks on the x-axis
@@ -121,12 +149,12 @@ public class AnimatedChartThing extends ChartingThing {
 			put.setColor(linecolor);
 
 			Path2D.Double e = new Path2D.Double();
-			if (!fillArea)// If the component is not set to fill beneath the
-							// line, then just move the first point to the
-							// appropriate place as specified by the data
-							// available
+			// If the component is not set to fill beneath the line, then just
+			// move the first point to the appropriate place as specified by the
+			// data available
+			if (!fillArea) {
 				e.moveTo(0, vstep * data.get(0));
-			else {
+			} else {
 				// move to origin
 				e.moveTo(0, 0);
 				// line to the first datapoint.
@@ -158,16 +186,19 @@ public class AnimatedChartThing extends ChartingThing {
 			put.draw(e);
 
 		}
+		// add one to the frame count.
 		frame += 1;
+		// if the frame count is equal to or greater than the size of the data
+		// array, set it to one again.
 		if (frame >= data.size())
 			frame = 1;
 
 	}
 
 	/**
-	 * @return the updaterate
+	 * @return the target rate of rendering the control.
 	 */
-	public int getUpdaterate() {
+	public float getUpdaterate() {
 		return updaterate;
 	}
 
@@ -175,7 +206,7 @@ public class AnimatedChartThing extends ChartingThing {
 	 * @param updaterate
 	 *            the updaterate to set
 	 */
-	public void setUpdaterate(int updaterate) {
-		this.updaterate = updaterate;
+	public void setUpdaterate(float updaterate) {
+		this.updaterate = 1000 / updaterate;
 	}
 }

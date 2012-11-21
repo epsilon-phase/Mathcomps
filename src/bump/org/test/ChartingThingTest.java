@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import bump.org.comp.ChartingThing;
+import bump.org.comp.SingleLineChart;
 import javax.swing.JTextField;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -20,7 +20,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import bump.org.comp.AnimatedChartThing;
+import bump.org.comp.AnimatedSingleLineChart;
 import java.awt.Color;
 
 public class ChartingThingTest extends JFrame {
@@ -32,7 +32,7 @@ public class ChartingThingTest extends JFrame {
 	}
 
 	private JPanel contentPane;
-	private ChartingThing qw;
+	private SingleLineChart qw;
 	private JTextField textField;
 	private JPopupMenu popupMenu;
 	private JCheckBoxMenuItem chckbxmntmBicubicInterpolation;
@@ -79,7 +79,7 @@ public class ChartingThingTest extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 
-		qw = new AnimatedChartThing();
+		qw = new AnimatedSingleLineChart();
 		qw.setBackgroundcolor(Color.BLACK);
 		qw.setCurvelines(false);
 		qw.setBicubic(true);

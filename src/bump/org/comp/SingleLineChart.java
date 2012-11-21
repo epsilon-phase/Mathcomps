@@ -16,8 +16,8 @@ import java.util.ArrayList;
 
 import bump.org.util.ChartingUtil;
 
-public class ChartingThing extends Canvas {
-	public ChartingThing() {
+public class SingleLineChart extends Canvas {
+	public SingleLineChart() {
 		super();
 		this.data = new ArrayList<Integer>();
 
@@ -208,7 +208,7 @@ public class ChartingThing extends Canvas {
 
 	/**
 	 * @return the curvelines
-	 * @see bump.org.comp.ChartingThing.curvelines
+	 * @see bump.org.comp.SingleLineChart.curvelines
 	 */
 	public boolean isCurvelines() {
 		return curvelines;
@@ -217,7 +217,7 @@ public class ChartingThing extends Canvas {
 	/**
 	 * @param curvelines
 	 *            whether or not the lines should be curved.
-	 * @see bump.org.comp.ChartingThing.curvelines
+	 * @see bump.org.comp.SingleLineChart.curvelines
 	 */
 	public void setCurvelines(boolean curvelines) {
 		this.curvelines = curvelines;
