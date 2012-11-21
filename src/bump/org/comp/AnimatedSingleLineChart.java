@@ -10,7 +10,7 @@ import bump.org.util.ChartingUtil;
 
 /**
  * Does the same old automatic constrained plotting thing as before, this time,
- * however, it shows the graph animating properly.
+ * however, it shows the graph animating.
  * 
  * @author Jaked122
  * 

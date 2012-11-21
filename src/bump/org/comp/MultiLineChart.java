@@ -165,8 +165,10 @@ public class MultiLineChart extends SingleLineChart {
 	 */
 	@Override
 	public final void addData(int[] i) {
+		ArrayList<Integer> g = data.get(targetseries);
 		for (int e : i)
-			data.get(targetseries).add(e);
+			g.add(e);
+		data.set(targetseries, g);
 		repaint();
 	}
 
@@ -181,7 +183,7 @@ public class MultiLineChart extends SingleLineChart {
 	 * @param color
 	 *            the color function to use in charting.
 	 */
-	public void setColorFunction(IColorFunction color) {
+	public final void setColorFunction(IColorFunction color) {
 		this.color = color;
 	}
 
