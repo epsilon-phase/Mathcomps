@@ -15,6 +15,20 @@ public class ChartingUtil {
 	}
 
 	/**
+	 * Find the maximum length of any given element in the array.
+	 * 
+	 * @param a
+	 *            the array of arrays to find the length of.
+	 * @return the largest length of any array in the list.
+	 */
+	public static int maxLength(ArrayList<ArrayList<Integer>> a) {
+		int i = 0;
+		for (ArrayList<Integer> e : a)
+			i = Math.max(i, e.size());
+		return i;
+	}
+
+	/**
 	 * Find the smallest integer in a collection.
 	 * 
 	 * @param a

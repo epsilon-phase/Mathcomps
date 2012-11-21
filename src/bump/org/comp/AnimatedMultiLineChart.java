@@ -1,46 +1,15 @@
 package bump.org.comp;
 
-import java.awt.BasicStroke;
-import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Collection;
 
-import bump.org.comp.color.IColorFunction;
 import bump.org.util.ChartingUtil;
 
-/**
- * <p>
- * Shows multiple lines on a single chart.
- * </p>
- * <p>
- * Works in a similar way to the single chart component (ChartingThing), but
- * shows multiple sets of data.
- * </p>
- * <p>
- * Data has a color determined by a IColorFunction(typically a ColorList) which
- * provides its own methods of changing the color scheme.
- * </p>
- * 
- * @author Jaked122
- * 
- */
-public class MultiLineChart extends SingleLineChart {
-	public void AddSeries(ArrayList<Integer> g) {
-		this.data.add(g);
-		repaint();
-	}
-
-	public void setSeriesAtIndex(ArrayList<Integer> g, int c) {
-		this.data.set(c, g);
-	}
-
+public class AnimatedMultiLineChart extends MultiLineChart {
 	public void paint(Graphics g) {
 		Graphics2D put = (Graphics2D) g.create();
 
@@ -93,7 +62,7 @@ public class MultiLineChart extends SingleLineChart {
 			// Move the start point of the path to the zero index of the list in
 			// question right now.
 			e.moveTo(0, vstep * data.get(c).get(0));
-			for (int i = 2; i < data.size(); i++) {
+			for (int i = 2; i < data.size() && i <= frame; i++) {
 				if (!isCurvelines())
 					e.lineTo(hstep * i, data.get(c).get(i) * vstep);
 				else {
@@ -107,86 +76,52 @@ public class MultiLineChart extends SingleLineChart {
 			put.draw(e);
 
 		}
+		frame += 1;
+		if (frame >= ChartingUtil.maxLength(data)) {
+			frame = 1;
+		}
 
 	}
 
-	@Override
-	public final Color getBackground() {
-		return this.getBackgroundcolor();
+	private float updateRate = 0.1F;
+
+	public void setUpdateRate(int updateRate) {
+		this.updateRate = 1000F / (float) updateRate;
 	}
 
-	@Override
-	public final void setBackground(Color g) {
-		this.setBackgroundcolor(g);
-		repaint();
+	public float getUpdateRate() {
+		return updateRate;
 	}
 
-	/**
-	 * <p>
-	 * The series that is manipulated by the setTargetSeries and returned by
-	 * getTargetSeries functions.
-	 * </p>
-	 * <p>
-	 * Controls which dataseries is manipulated by the addData and setData
-	 * functions
-	 * </p>
-	 */
-	private int targetseries = 0;
+	private int frame = 1;
+	Thread painted;
 
-	/**
-	 * Set the new dataseries to manipulate.
-	 * 
-	 * @param i
-	 *            the new series to target
-	 * @see bump.org.comp.MultiLineChart.targetseries
-	 */
-	public final void setTargetSeries(int i) {
-		targetseries = i;
+	public void finalize() throws Throwable {
+		this.painted.interrupt();
+		super.finalize();
 	}
 
-	/**
-	 * Get the dataseries that is being modified by the addData and the setData
-	 * commands.
-	 * 
-	 * @return the dataseries being manipulated
-	 * @see bump.org.comp.MultiLineChart.targetseries
-	 */
-	public final int getTargetSeries() {
-		return targetseries;
-	}
+	public AnimatedMultiLineChart() {
+		painted = new Thread(new Runnable() {
 
-	/**
-	 * Add data to the current target series.
-	 * 
-	 * @param i
-	 *            <p>
-	 *            The array of data to add to the chart.
-	 *            </p>
-	 */
-	@Override
-	public final void addData(int[] i) {
-		ArrayList<Integer> g = data.get(targetseries);
-		for (int e : i)
-			g.add(e);
-		data.set(targetseries, g);
-		repaint();
-	}
+			@Override
+			public void run() {
+				while (true) {
+					if (AnimatedMultiLineChart.this.isVisible())
+						AnimatedMultiLineChart.this.repaint();
+					try {
+						Thread.sleep((int) (1000 * AnimatedMultiLineChart.this
+								.getUpdateRate()));
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						return;
+					}
+				}
+			}
 
-	/**
-	 * @return the color
-	 */
-	public final IColorFunction getColorFunction() {
-		return color;
-	}
+		});
+		painted.run();
 
-	/**
-	 * @param color
-	 *            the color function to use in charting.
-	 */
-	public final void setColorFunction(IColorFunction color) {
-		this.color = color;
 	}
-
-	protected IColorFunction color;
-	ArrayList<ArrayList<Integer>> data;
 }
