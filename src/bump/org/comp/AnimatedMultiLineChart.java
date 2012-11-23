@@ -7,9 +7,18 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 
+import bump.org.comp.Animation.IAnimatedChart;
 import bump.org.util.ChartingUtil;
 
-public class AnimatedMultiLineChart extends MultiLineChart {
+public class AnimatedMultiLineChart extends MultiLineChart implements
+		IAnimatedChart {
+	/**
+	 * Set the frame counter back to 1.
+	 */
+	public void resetFrame() {
+		frame = 1;
+	}
+
 	public void paint(Graphics g) {
 		Graphics2D put = (Graphics2D) g.create();
 

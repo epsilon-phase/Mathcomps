@@ -14,6 +14,14 @@ public class ChartingUtil {
 
 	}
 
+	public static double slope(int point1, int point2, int diff) {
+		return (point2 - point1) / diff;
+	}
+
+	public static double pointslope(double x, double slope, int point1, int x1) {
+		return point1 + slope * x + slope * x1;
+	}
+
 	/**
 	 * Find the maximum length of any given element in the array.
 	 * 

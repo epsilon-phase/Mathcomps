@@ -6,6 +6,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Path2D.Double;
 
+import bump.org.comp.Animation.IAnimatedChart;
 import bump.org.util.ChartingUtil;
 
 /**
@@ -15,7 +16,12 @@ import bump.org.util.ChartingUtil;
  * @author Jaked122
  * 
  */
-public class AnimatedSingleLineChart extends SingleLineChart {
+public class AnimatedSingleLineChart extends SingleLineChart implements
+		IAnimatedChart {
+	public void resetFrame() {
+		frame = 1;
+	}
+
 	/**
 	 * The initial update rate for the control, ends up being around ten frames
 	 * a second.
@@ -72,7 +78,7 @@ public class AnimatedSingleLineChart extends SingleLineChart {
 					try {
 						// sleep so that the frameness is correctly done.
 						Thread.sleep((int) (1000 * (AnimatedSingleLineChart.this
-								.getUpdaterate())));
+								.getUpdateRate())));
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -198,7 +204,7 @@ public class AnimatedSingleLineChart extends SingleLineChart {
 	/**
 	 * @return the target rate of rendering the control.
 	 */
-	public float getUpdaterate() {
+	public float getUpdateRate() {
 		return updaterate;
 	}
 
@@ -206,7 +212,7 @@ public class AnimatedSingleLineChart extends SingleLineChart {
 	 * @param updaterate
 	 *            the updaterate to set
 	 */
-	public void setUpdaterate(float updaterate) {
-		this.updaterate = 1000 / updaterate;
+	public void setUpdateRate(int updaterate) {
+		this.updaterate = 1000F / (float) updaterate;
 	}
 }

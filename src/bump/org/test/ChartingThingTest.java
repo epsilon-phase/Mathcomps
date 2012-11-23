@@ -10,6 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import bump.org.comp.SingleLineChart;
+import bump.org.comp.SmoothAnimatedSingleLineChart;
+
 import javax.swing.JTextField;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -79,7 +81,7 @@ public class ChartingThingTest extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 
-		qw = new AnimatedSingleLineChart();
+		qw = new SmoothAnimatedSingleLineChart();
 		qw.setBackgroundcolor(Color.BLACK);
 		qw.setCurvelines(false);
 		qw.setBicubic(true);
