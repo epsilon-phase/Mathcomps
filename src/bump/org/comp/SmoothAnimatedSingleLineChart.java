@@ -1,5 +1,6 @@
 package bump.org.comp;
 
+import java.awt.BasicStroke;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -14,8 +15,8 @@ import bump.org.util.ChartingUtil;
 
 public class SmoothAnimatedSingleLineChart extends SingleLineChart implements
 		IAnimatedChart {
-	private float updaterate = 0.5F;
-	private int fpp = 10;
+	private float updaterate = 0.25F;
+	private int fpp = 15;
 	private int frame = 1;
 
 	public int getFramesperPoint() {
@@ -27,6 +28,8 @@ public class SmoothAnimatedSingleLineChart extends SingleLineChart implements
 	}
 
 	public void update(Graphics g) {
+	
+		this.createBufferStrategy(2);
 		this.setBackground(getBackgroundcolor());
 		super.update(g);
 	}
@@ -65,7 +68,6 @@ public class SmoothAnimatedSingleLineChart extends SingleLineChart implements
 			// set the color to the background color member
 			put.setColor(getBackgroundcolor());
 			// Fill the background of the graph
-			put.fill(new Rectangle2D.Float(0, 0, getWidth(), getHeight()));
 			drawTicks(put, hstep, vstep);
 			put.setColor(linecolor);
 			Path2D.Double a = new Path2D.Double();
@@ -74,6 +76,8 @@ public class SmoothAnimatedSingleLineChart extends SingleLineChart implements
 			for (i = 1; i < data.size() && i < (float) frame / (float) fpp; i++) {
 				a.lineTo(hstep * i, vstep * data.get(i));
 			}
+			if (i == data.size())
+				i--;
 			a.lineTo(
 					((float) frame / (float) fpp) * hstep,
 					vstep
@@ -82,15 +86,17 @@ public class SmoothAnimatedSingleLineChart extends SingleLineChart implements
 									ChartingUtil.slope(data.get(i - 1),
 											data.get(i), 1), data.get(i - 1),
 									i - 1));
+			put.setStroke(new BasicStroke(1.5F));
 			put.draw(a);
-			put.draw(new Ellipse2D.Double((frame / fpp) * hstep,
-					ChartingUtil
+			put.draw(new Ellipse2D.Double(
+					((float) frame / (float) fpp) * hstep, ChartingUtil
 							.pointslope(
 									(float) frame / (float) fpp,
 									ChartingUtil.slope(data.get(i - 1),
 											data.get(i), 1), data.get(i - 1),
 									i - 1)
 							* vstep, 2, 2));
+
 			frame += 1;
 			if (frame >= data.size() * fpp)
 				frame = 1;
