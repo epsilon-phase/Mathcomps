@@ -85,13 +85,20 @@ public class BitDisplayTest extends JFrame {
 				} else {
 					// bitDisplay.Randomize(bitDisplay.getData().size()+1);
 				}
-				BitSet gg = bitDisplay.getData();
-				BigInteger a = new BigInteger("0", 10);
-				for (int i = 0; i < gg.size(); i++) {
-					if (gg.get(i))
-						a=a.setBit(i);
+				if (e.isShiftDown()) {
+					bitDisplay.AddData(true);
 				}
-				setTitle(a.toString());
+				if (e.isControlDown()) {
+					BitSet gg = bitDisplay.getData();
+					BigInteger a = new BigInteger("0", 10);
+					for (int i = 0; i < gg.size(); i++) {
+						if (gg.get(i))
+							a = a.setBit(i);
+					}
+					setTitle(a.toString() + ":" + Integer.toString(gg.size()));
+				} else {
+					setTitle(Integer.toString(bitDisplay.getData().size()));
+				}
 			}
 		});
 
