@@ -49,6 +49,7 @@ public class BitDisplayTest extends JFrame {
 		setContentPane(contentPane);
 
 		bitDisplay = new BitDisplay();
+		bitDisplay.setPaintmode(true);
 		bitDisplay.setEditable(true);
 		bitDisplay.setForeground(Color.RED);
 		bitDisplay.getData().set(0, 2, true);
@@ -95,7 +96,7 @@ public class BitDisplayTest extends JFrame {
 						if (gg.get(i))
 							a = a.setBit(i);
 					}
-					setTitle(a.toString() + ":" + Integer.toString(gg.size()));
+					setTitle(a.toString(10) + ":" + Integer.toString(gg.size()));
 				} else {
 					setTitle(Integer.toString(bitDisplay.getData().size()));
 				}
