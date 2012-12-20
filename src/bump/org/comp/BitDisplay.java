@@ -22,37 +22,38 @@ import java.util.BitSet;
 import java.util.Random;
 
 public class BitDisplay extends Canvas {
+	private final class ResizedListener implements ComponentListener {
+		@Override
+		public void componentShown(ComponentEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void componentResized(ComponentEvent e) {
+			changed = true;
+		}
+
+		@Override
+		public void componentMoved(ComponentEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void componentHidden(ComponentEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+	}
+
 	private BitSet data = new BitSet(10);
 
 	public BitDisplay() {
 		Random q = new Random();
 		for (int i = 0; i < 10; i++)
 			data.set(i, q.nextBoolean());
-		this.addComponentListener(new ComponentListener() {
-
-			@Override
-			public void componentShown(ComponentEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void componentResized(ComponentEvent e) {
-				changed = true;
-			}
-
-			@Override
-			public void componentMoved(ComponentEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void componentHidden(ComponentEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-		});
+		this.addComponentListener(new ResizedListener());
 		this.addMouseListener(new MouseListener() {
 
 			@Override
@@ -290,22 +291,22 @@ public class BitDisplay extends Canvas {
 	 * @param isEditable
 	 *            the isEditable to set
 	 */
-	public void setEditable(boolean isEditable) {
+	public final void setEditable(final boolean isEditable) {
 		this.isEditable = isEditable;
 	}
 
 	/**
 	 * @return the paintmode
 	 */
-	public boolean isPaintmode() {
+	public final boolean isPaintmode() {
 		return paintmode;
 	}
 
 	/**
-	 * @param paintmode
+	 * @param paint
 	 *            the paintmode to set
 	 */
-	public void setPaintmode(boolean paintmode) {
-		this.paintmode = paintmode;
+	public final void setPaintmode(final boolean paint) {
+		this.paintmode = paint;
 	}
 }
